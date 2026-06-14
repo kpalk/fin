@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Box,
@@ -52,6 +52,27 @@ const JoinerCards = ({ state, myId, onPickCard, onDeselectCard, onSendEmote }: J
     const [confirmLeave, setConfirmLeave] = useState(false);
     const lastSentRef = useRef<Partial<Record<EmoteType, number>>>({});
     const [coolingDown, setCoolingDown] = useState<Partial<Record<EmoteType, boolean>>>({});
+
+    const [winW, setWinW] = useState(window.innerWidth);
+    const [winH, setWinH] = useState(window.innerHeight);
+    useEffect(() => {
+        const handler = () => {
+            setWinW(window.innerWidth);
+            setWinH(window.innerHeight);
+        };
+        window.addEventListener('resize', handler);
+        return () => window.removeEventListener('resize', handler);
+    }, []);
+
+    const cols = availableCards.length <= 4 ? 2 : availableCards.length <= 6 ? 3 : 4;
+    const cardSize = useMemo(() => {
+        const gap = 8;
+        const aspectRatio = 98 / 68;
+        const fromWidth = (winW * 0.9 - (cols - 1) * gap) / cols;
+        const fromHeight = (winH * 0.5 - gap) / 2 / aspectRatio;
+        const w = Math.min(fromWidth, fromHeight, 110);
+        return { w: Math.round(w), h: Math.round(w * aspectRatio) };
+    }, [cols, winW, winH]);
 
     const handleCardTap = (card: CardValue) => {
         if (isRevealed) return;
@@ -115,8 +136,8 @@ const JoinerCards = ({ state, myId, onPickCard, onDeselectCard, onSendEmote }: J
                         <Box
                             sx={{
                                 display: 'grid',
-                                gridTemplateColumns: `repeat(${availableCards.length <= 4 ? 2 : availableCards.length <= 6 ? 3 : 4}, 68px)`,
-                                gap: { xs: 1, sm: 1.5 },
+                                gridTemplateColumns: `repeat(${cols}, ${cardSize.w}px)`,
+                                gap: 1,
                             }}
                         >
                             {availableCards.map((card) => (
@@ -126,6 +147,8 @@ const JoinerCards = ({ state, myId, onPickCard, onDeselectCard, onSendEmote }: J
                                         variant="joiner"
                                         selected={picked === card}
                                         onClick={() => handleCardTap(card)}
+                                        cardW={cardSize.w}
+                                        cardH={cardSize.h}
                                     />
                                 </Box>
                             ))}
@@ -165,6 +188,7 @@ const JoinerCards = ({ state, myId, onPickCard, onDeselectCard, onSendEmote }: J
                             transition: 'opacity 0.2s ease',
                             color: 'text.secondary',
                             '&:hover': { color: 'primary.main' },
+                            '&.Mui-focusVisible': { color: 'text.secondary' },
                         }}
                     >
                         <Icon fontSize="medium" />

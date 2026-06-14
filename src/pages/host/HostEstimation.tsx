@@ -92,10 +92,29 @@ const HostEstimation = ({
     const joinUrl = `${window.location.origin}${import.meta.env.BASE_URL}?join=${peerId}`;
 
     const handleCopy = () => {
-        navigator.clipboard.writeText(joinUrl).then(() => {
+        const confirm = () => {
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
-        });
+        };
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(joinUrl).then(confirm).catch(() => {
+                const el = document.createElement('textarea');
+                el.value = joinUrl;
+                document.body.appendChild(el);
+                el.select();
+                document.execCommand('copy');
+                document.body.removeChild(el);
+                confirm();
+            });
+        } else {
+            const el = document.createElement('textarea');
+            el.value = joinUrl;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            confirm();
+        }
     };
 
     const { players, phase, availableCards, acceptedEstimate } = state;
@@ -209,13 +228,13 @@ const HostEstimation = ({
     const headerRight = (
         <Stack direction="row" gap={0.5}>
             <Tooltip title="Show join QR">
-                <IconButton size="small" onClick={() => setJoinOpen(true)}>
-                    <QrCode2RoundedIcon fontSize="small" />
+                <IconButton size="large" onClick={() => setJoinOpen(true)}>
+                    <QrCode2RoundedIcon fontSize="medium" />
                 </IconButton>
             </Tooltip>
             <Tooltip title="Start new estimate">
                 <IconButton
-                    size="small"
+                    size="large"
                     onClick={() => {
                         if (activeCount > 0 && !acceptedEstimate) {
                             setPendingAction('startNew');
@@ -225,12 +244,12 @@ const HostEstimation = ({
                         }
                     }}
                 >
-                    <RestartAltRoundedIcon fontSize="small" />
+                    <RestartAltRoundedIcon fontSize="medium" />
                 </IconButton>
             </Tooltip>
             <Tooltip title="Configure deck">
                 <IconButton
-                    size="small"
+                    size="large"
                     onClick={() => {
                         if (activeCount > 0 && !acceptedEstimate) {
                             setPendingAction('openConfig');
@@ -239,7 +258,7 @@ const HostEstimation = ({
                         }
                     }}
                 >
-                    <TuneRoundedIcon fontSize="small" />
+                    <TuneRoundedIcon fontSize="medium" />
                 </IconButton>
             </Tooltip>
         </Stack>
@@ -288,7 +307,9 @@ const HostEstimation = ({
                         </FinButton>
                     </Box>
                 ) : (
-                    <EstimationCard value={centerValue} variant="center" accepted={!!acceptedEstimate} />
+                    <Box sx={{ width: 200, height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <EstimationCard value={centerValue} variant="center" accepted={!!acceptedEstimate} />
+                    </Box>
                 )}
 
                 {/* Reserved button area — fixed height prevents layout shift */}
@@ -353,16 +374,34 @@ const HostEstimation = ({
 
             {/* Player cards row */}
             <Box sx={{ display: players.length === 0 ? 'none' : undefined }}>
-                {(!isRevealed || (!acceptedEstimate && !isUnanimous)) && (
-                    <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{ mb: 1, display: 'block', textAlign: 'center' }}
-                    >
-                        {isRevealed ? 'Tap cards to select' : `${activeCount} of ${players.length} voted`}
-                    </Typography>
-                )}
-                <Stack direction="row" flexWrap="wrap" gap={1.5} justifyContent="center" sx={{ pb: 1 }}>
+                <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{
+                        mb: 1,
+                        display: 'block',
+                        textAlign: 'center',
+                        visibility: !isRevealed || (!acceptedEstimate && !isUnanimous) ? 'visible' : 'hidden',
+                    }}
+                >
+                    {isRevealed ? 'Tap cards to select' : `${activeCount} of ${players.length} voted`}
+                </Typography>
+                <Stack
+                    direction="row"
+                    gap={1.5}
+                    justifyContent="safe center"
+                    sx={{
+                        pb: 1,
+                        overflowX: 'auto',
+                        // hide scrollbar visually but keep it functional
+                        scrollbarWidth: 'none',
+                        '&::-webkit-scrollbar': { display: 'none' },
+                        // fade edges to hint scrollability
+                        maskImage:
+                            'linear-gradient(to right, transparent 0%, black 24px, black calc(100% - 24px), transparent 100%)',
+                        px: 3,
+                    }}
+                >
                     {sortedPlayers.map((player) => (
                         <EstimationCard
                             key={player.id}
@@ -448,7 +487,6 @@ const HostEstimation = ({
                             startIcon={<ContentCopyRoundedIcon />}
                             sx={{
                                 textTransform: 'none',
-                                fontSize: '0.78rem',
                                 color: 'text.secondary',
                                 borderColor: 'divider',
                             }}

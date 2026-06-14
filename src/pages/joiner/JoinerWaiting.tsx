@@ -61,12 +61,14 @@ const JoinerWaiting = ({ players, myId }: JoinerWaitingProps) => {
                                 <Chip
                                     key={p.id}
                                     label={p.name}
-                                    size="small"
                                     color={p.id === myId ? 'primary' : 'default'}
                                     variant={p.id === myId ? 'filled' : 'outlined'}
+                                    sx={{ fontSize: '1rem' }}
                                 />
                             ))}
-                            {hiddenCount > 0 && <Chip label={`+${hiddenCount}`} size="small" variant="outlined" />}
+                            {hiddenCount > 0 && (
+                                <Chip label={`+${hiddenCount}`} variant="outlined" sx={{ fontSize: '1rem' }} />
+                            )}
                         </Stack>
                     );
                 })()}

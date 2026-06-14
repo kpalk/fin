@@ -50,7 +50,7 @@ const JoinerEntry = ({ connected, onJoin, nameTaken }: JoinerEntryProps) => {
                 label="Your name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                slotProps={{ htmlInput: { maxLength: 32 } }}
+                slotProps={{ htmlInput: { maxLength: 20 } }}
                 sx={{ maxWidth: 320 }}
                 disabled={!connected}
                 error={nameTaken}

@@ -72,8 +72,9 @@ export function useHostPeer() {
                 const msg = raw as JoinerMessage;
 
                 if (msg.type === 'JOIN') {
+                    const name = msg.name.slice(0, 20);
                     const nameTaken = stateRef.current.players.some(
-                        (p) => p.id !== conn.peer && p.name.toLowerCase() === msg.name.toLowerCase()
+                        (p) => p.id !== conn.peer && p.name.toLowerCase() === name.toLowerCase()
                     );
                     if (nameTaken) {
                         if (conn.open) conn.send({ type: 'NAME_TAKEN' } satisfies HostMessage);
@@ -81,7 +82,7 @@ export function useHostPeer() {
                     }
                     updateState((prev) => ({
                         ...prev,
-                        players: [...prev.players.filter((p) => p.id !== conn.peer), { id: conn.peer, name: msg.name }],
+                        players: [...prev.players.filter((p) => p.id !== conn.peer), { id: conn.peer, name }],
                     }));
                 } else if (msg.type === 'PICK_CARD') {
                     updateState((prev) => ({

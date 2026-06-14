@@ -27,10 +27,13 @@ interface EstimationCardProps {
     disabled?: boolean;
     onClick?: () => void;
     variant?: CardVariant;
+    /** Override card dimensions (joiner responsive sizing) */
+    cardW?: number;
+    cardH?: number;
 }
 
 const SIZE = {
-    player: { w: 72, h: 104, fontSize: '1.4rem', nameSize: '0.65rem' },
+    player: { w: 108, h: 156, fontSize: '2.1rem', nameSize: '1rem' },
     center: { w: 140, h: 200, fontSize: '3rem', nameSize: '0' },
     joiner: { w: 68, h: 98, fontSize: '1.4rem', nameSize: '0' },
 };
@@ -45,16 +48,21 @@ const EstimationCard = ({
     disabled = false,
     onClick,
     variant = 'player',
+    cardW,
+    cardH,
 }: EstimationCardProps) => {
     const s = SIZE[variant];
+    const w = cardW ?? s.w;
+    const h = cardH ?? s.h;
+    const fontSize = cardW ? `${(1.4 * cardW / 68).toFixed(2)}rem` : s.fontSize;
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5 }}>
             <Box
                 onClick={!disabled ? onClick : undefined}
                 sx={{
-                    width: s.w,
-                    height: s.h,
+                    width: w,
+                    height: h,
                     borderRadius: 1,
                     cursor: disabled ? 'default' : onClick ? 'pointer' : 'default',
                     position: 'relative',
@@ -99,7 +107,7 @@ const EstimationCard = ({
                     }}
                 />
                 {faceDown ? (
-                    <svg width={s.w * 0.55} height={s.w * 0.55} viewBox="0 0 100 100" fill="none">
+                    <svg width={w * 0.55} height={w * 0.55} viewBox="0 0 100 100" fill="none">
                         <path
                             d="M18 90 L26 16 C28 6, 40 4, 56 20 C68 34, 76 60, 82 90 C70 86, 55 84, 40 85 Z"
                             fill="rgba(255,255,255,0.28)"
@@ -108,7 +116,7 @@ const EstimationCard = ({
                 ) : (
                     <Typography
                         sx={{
-                            fontSize: s.fontSize,
+                            fontSize: fontSize,
                             fontWeight: 800,
                             color: selected ? 'white' : 'text.primary',
                             lineHeight: 1,
@@ -124,7 +132,7 @@ const EstimationCard = ({
                     sx={{
                         fontSize: s.nameSize !== '0' ? s.nameSize : undefined,
                         color: 'text.secondary',
-                        maxWidth: s.w,
+                        maxWidth: w,
                         textOverflow: 'ellipsis',
                         overflow: 'hidden',
                         whiteSpace: 'nowrap',

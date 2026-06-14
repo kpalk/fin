@@ -17,6 +17,12 @@ export const theme = createTheme({
     typography: {
         fontFamily: '"Inter", "Roboto", sans-serif',
         fontWeightBold: 700,
+        body1: {
+            fontSize: '1.25rem',
+        },
+        body2: {
+            fontSize: '1rem',
+        },
     },
     shape: {
         borderRadius: 12,
@@ -52,6 +58,14 @@ export const theme = createTheme({
             styleOverrides: {
                 root: {
                     fontWeight: 600,
+                },
+            },
+        },
+        MuiTooltip: {
+            styleOverrides: {
+                tooltip: {
+                    fontSize: '1rem',
+                    maxWidth: 400,
                 },
             },
         },

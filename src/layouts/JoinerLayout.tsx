@@ -23,7 +23,11 @@ const JoinerLayout = ({ children, myName, onLogoClick }: JoinerLayoutProps) => {
         >
             <AppHeader
                 onLogoClick={onLogoClick}
-                right={myName ? <Chip label={myName} size="small" color="primary" variant="outlined" /> : undefined}
+                right={
+                    myName ? (
+                        <Chip label={myName} color="primary" variant="outlined" sx={{ fontSize: '1rem' }} />
+                    ) : undefined
+                }
             />
             {children}
         </Box>

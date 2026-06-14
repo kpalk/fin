@@ -32,10 +32,29 @@ const HostLobby = ({ peerId, players, onBegin, onGoHome }: HostLobbyProps) => {
     const [confirmHome, setConfirmHome] = useState(false);
 
     const handleCopy = () => {
-        navigator.clipboard.writeText(joinUrl).then(() => {
+        const confirm = () => {
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
-        });
+        };
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(joinUrl).then(confirm).catch(() => {
+                const el = document.createElement('textarea');
+                el.value = joinUrl;
+                document.body.appendChild(el);
+                el.select();
+                document.execCommand('copy');
+                document.body.removeChild(el);
+                confirm();
+            });
+        } else {
+            const el = document.createElement('textarea');
+            el.value = joinUrl;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            confirm();
+        }
     };
 
     const handleLogoClick = () => {
@@ -68,7 +87,6 @@ const HostLobby = ({ peerId, players, onBegin, onGoHome }: HostLobbyProps) => {
                             startIcon={<ContentCopyRoundedIcon />}
                             sx={{
                                 textTransform: 'none',
-                                fontSize: '0.78rem',
                                 color: 'text.secondary',
                                 borderColor: 'divider',
                             }}
@@ -93,19 +111,44 @@ const HostLobby = ({ peerId, players, onBegin, onGoHome }: HostLobbyProps) => {
                 </FinButton>
 
                 <Box sx={{ textAlign: 'center', width: '100%' }}>
-                    <Typography variant="body2" color="text.secondary" gutterBottom>
+                    <Typography variant="body2" color="text.secondary" gutterBottom sx={{ mb: 2 }}>
                         {players.length === 0 ? (
                             <>
                                 <span>Waiting for teammates</span>
                                 <AnimatedDots />
                             </>
                         ) : (
-                            `${players.length} teammate${players.length !== 1 ? 's' : ''} joined`
+                            <>
+                                <span>
+                                    {players.length} teammate{players.length !== 1 ? 's' : ''} joined — waiting for
+                                    more
+                                </span>
+                                <AnimatedDots />
+                            </>
                         )}
                     </Typography>
-                    <Stack direction="row" flexWrap="wrap" gap={1} justifyContent="center" mt={1}>
+                    <Stack
+                        direction="row"
+                        flexWrap="wrap"
+                        gap={1}
+                        justifyContent="center"
+                        mt={1}
+                        sx={{
+                            maxHeight: 150,
+                            overflowY: 'auto',
+                            scrollbarWidth: 'none',
+                            '&::-webkit-scrollbar': { display: 'none' },
+                            maskImage: 'linear-gradient(to bottom, black 120px, transparent 150px)',
+                        }}
+                    >
                         {[...players].reverse().map((p) => (
-                            <Chip key={p.id} label={p.name} size="small" color="primary" variant="outlined" />
+                            <Chip
+                                key={p.id}
+                                label={p.name}
+                                color="primary"
+                                variant="outlined"
+                                sx={{ fontSize: '1rem' }}
+                            />
                         ))}
                     </Stack>
                 </Box>

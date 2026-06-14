@@ -9,7 +9,7 @@ interface AppHeaderProps {
 const AppHeader = ({ onLogoClick, right }: AppHeaderProps) => {
     return (
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', minHeight: 36 }}>
-            <FinLogo size={28} sx={{ color: 'primary.main' }} onClick={onLogoClick} />
+            <FinLogo size={40} sx={{ color: 'primary.main' }} onClick={onLogoClick} />
             {right && <Box sx={{ display: 'flex', alignItems: 'center' }}>{right}</Box>}
         </Box>
     );
