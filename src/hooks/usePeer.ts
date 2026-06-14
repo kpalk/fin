@@ -3,6 +3,24 @@ import Peer, { type DataConnection } from 'peerjs';
 import type { GameState, JoinerMessage, HostMessage, CardValue, EmoteType } from '../types';
 import { FIBONACCI_CARDS } from '../types';
 
+const ICE_CONFIG = {
+    config: {
+        iceServers: [
+            { urls: 'stun:stun.l.google.com:19302' },
+            {
+                urls: 'turn:openrelay.metered.ca:80',
+                username: 'openrelayproject',
+                credential: 'openrelayproject',
+            },
+            {
+                urls: 'turn:openrelay.metered.ca:443',
+                username: 'openrelayproject',
+                credential: 'openrelayproject',
+            },
+        ],
+    },
+};
+
 // ─── HOST HOOK ────────────────────────────────────────────────────────────────
 
 const INITIAL_STATE: GameState = {
@@ -42,7 +60,7 @@ export function useHostPeer() {
     );
 
     useEffect(() => {
-        const peer = new Peer();
+        const peer = new Peer(ICE_CONFIG);
         peerRef.current = peer;
 
         peer.on('open', (id) => setPeerId(id));
@@ -171,7 +189,7 @@ export function useJoinerPeer(hostId: string) {
     const [hostLeft, setHostLeft] = useState(false);
 
     useEffect(() => {
-        const peer = new Peer();
+        const peer = new Peer(ICE_CONFIG);
         peerRef.current = peer;
 
         peer.on('open', (id) => {
